@@ -1,4 +1,4 @@
-#from cgitb import handler
+from typing import List
 from flask import Flask, render_template, request, Response
 from os import environ
 from dbcontext import db_data, db_delete, db_add, health_check
@@ -6,6 +6,20 @@ from person import Person
 import logging
 
 app = Flask(__name__)
+
+@app.route("/health")
+def health():
+    health_messages = []
+  
+    try:
+        app.logger.info("Application is running")
+        health_messages.append("Application: Healthy")
+    except Exception as e:
+        app.logger.error(f"Application health check failed: {e}")
+        health_messages.append("Application: Not Healthy")
+    combined_health_status = "\\\\n".join(health_messages)
+    return combined_health_status
+
 app.logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
 handler.setLevel(logging.INFO)
@@ -20,7 +34,7 @@ backend = environ.get('BACKEND') or "http://localhost"
 @app.route("/")
 def main():
     app.logger.info("Entering main route")
-    data = db_data()
+    data: List[Person] = db_data()  # Assuming db_data returns a list of Person
     return render_template("index.html.jinja", host_name=host_name, db_host=db_host, data=data, backend=backend)
 
 @app.route("/delete/<int:id>", methods=["DELETE"])
