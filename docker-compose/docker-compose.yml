@@ -1,5 +1,7 @@
   workprofile:
-    build: ..
+    build:
+      context: ..
+      dockerfile: Dockerfile
     container_name: workprofile
     restart: always
     environment:
