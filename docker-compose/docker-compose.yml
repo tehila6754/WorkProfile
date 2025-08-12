@@ -1,45 +1,16 @@
-version: "3.9"
+version: "3.8"
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: workprofile
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
   workprofile:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    container_name: workprofile
-    restart: always
-    environment:
-      DB_HOST: mysql
-      DB_USER: root
-      DB_PASSWORD: root
-      DB_NAME: workprofile
-      FLASK_ENV: production
-    depends_on:
-      - mysql
+    build: ..
     ports:
       - "5000:5000"
 
   nginx:
     image: nginx:alpine
-    container_name: nginx
-    restart: always
-    volumes:
-      - ../nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - workprofile
-
-volumes:
-  mysql_data:
